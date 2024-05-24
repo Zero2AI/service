@@ -12,7 +12,7 @@ from gradio_client import Client
 class z2ai_text_2_image(z2ai_text_2_image_pb2_grpc.z2ai_text_2_imageServicer):
 
     def predict(self, request, context):
-        space_client = Client(src='whiter4ven/text-to-image')
+        space_client = Client(src='video25/ZB-Tech-Text-to-Image')
 
         fileName1 = space_client.predict(request.input1, api_name='/predict')
         with open(fileName1, mode='rb') as f:
