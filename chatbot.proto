@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package chatbot;
+
+service Chatbot {
+  rpc Chat (stream ChatRequest) returns (stream ChatResponse) {}
+}
+
+message ChatRequest {
+  string message = 1;
+}
+
+message ChatResponse {
+  string message = 1;
+  bool is_thinking = 2;
+  string thought_process = 3;
+}
