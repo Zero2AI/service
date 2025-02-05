@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package uiapp;
+
+// The UIApp service definition
+service UIApp {
+    rpc Predict (PredictRequest) returns (PredictResponse);
+}
+
+// Request message containing the user input
+message PredictRequest {
+    string user_input = 1;
+}
+
+// Response message containing the result
+message PredictResponse {
+    string result = 1;
+}
