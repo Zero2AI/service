@@ -15,7 +15,7 @@ class ocr2txt(ocr2txt_pb2_grpc.ocr2txtServicer):
         with open(request.fileName2, mode='wb') as f:
             f.write(request.fileBytes2)
         space_client = Client(
-            src='https://huggingface.co/spaces/pragnakalp/OCR-image-to-text')
+            src='https://pragnakalp-ocr-image-to-text.hf.space/--replicas/5dpj4/')
         #src='https://pragnakalp-ocr-image-to-text.hf.space/--replicas/ydkay/')
 
         output1 = space_client.predict(
