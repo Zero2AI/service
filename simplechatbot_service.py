@@ -3,45 +3,35 @@ import logging
 import grpc
 import simplechatbot_pb2
 import simplechatbot_pb2_grpc
-from gradio_client import Client
+import httpx
+from fastapi import FastAPI, HTTPException
 
+app = FastAPI()
 
 class simplechatbot(simplechatbot_pb2_grpc.simplechatbotServicer):
 
-    def predict(self, request, context):
+    async def predict(self, request, context):
         try:
-            # Initialize the Gradio client
-            space_client = Client(
-                #src='https://zero2ai-simplechat.hf.space/'
-                src='http://52.204.24.135:9128'
-            )
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "http://52.204.24.135:9128/predict",
+                    json={"input1": request.input1}
+                )
+                response.raise_for_status()
+                result = response.json()
 
-            # Call the predict method
-            output1 = space_client.predict(
-                request.input1, api_name='/predict'
-            )
+            return simplechatbot_pb2.predict_resp(output1=result["output1"])
 
-            # Return the response
-            return simplechatbot_pb2.predict_resp(output1=output1)
-
-        except Exception as e:
-            # Handle all exceptions
+        except httpx.HTTPStatusError as e:
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Error calling Gradio API: {str(e)}")
+            context.set_details(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            return simplechatbot_pb2.predict_resp(output1="")
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error calling API: {str(e)}")
             return simplechatbot_pb2.predict_resp(output1="")
 
-
-# Main server body
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4), 
-                         options=[('grpc.max_message_length', 64*1024*1024),
-                                  ('grpc.max_send_message_length', 64*1024*1024),
-                                  ('grpc.max_receive_message_length', 64*1024*1024)])
-    simplechatbot_pb2_grpc.add_simplechatbotServicer_to_server(simplechatbot(), server)
-    server.add_insecure_port('[::]:50051')
-    server.start()
-    server.wait_for_termination()
-
+# ... existing code ...
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
