@@ -12,7 +12,8 @@ class simplechatbot(simplechatbot_pb2_grpc.simplechatbotServicer):
         try:
             # Initialize the Gradio client
             space_client = Client(
-                src='https://zero2ai-simplechat.hf.space/'
+                #src='https://zero2ai-simplechat.hf.space/'
+                src='http://52.204.24.135:9128'
             )
 
             # Call the predict method
