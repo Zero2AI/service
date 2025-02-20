@@ -31,7 +31,15 @@ class simplechatbot(simplechatbot_pb2_grpc.simplechatbotServicer):
             context.set_details(f"Error calling API: {str(e)}")
             return simplechatbot_pb2.predict_resp(output1="")
 
-# ... existing code ...
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4), 
+                         options=[('grpc.max_message_length', 64*1024*1024),
+                                  ('grpc.max_send_message_length', 64*1024*1024),
+                                  ('grpc.max_receive_message_length', 64*1024*1024)])
+    simplechatbot_pb2_grpc.add_simplechatbotServicer_to_server(simplechatbot(), server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    server.wait_for_termination()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
