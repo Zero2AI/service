@@ -1,8 +1,8 @@
 from concurrent import futures
 import grpc
 import time
-import appstorm_pb2
-import appstorm_pb2_grpc
+import appstormapp_pb2
+import appstormapp_pb2_grpc
 
 # Mock functions for apiService logic
 def init_session():
@@ -24,7 +24,7 @@ def get_share_link(finalAppId, token, sessionId):
     return f"https://appstormapi4snet.zero2ai.net/generate-app"
 
 # Service class
-class AppStormServiceServicer(appstorm_pb2_grpc.AppStormServiceServicer):
+class AppStormServiceServicer(appstormapp_pb2_grpc.AppStormServiceServicer):
     
     def GenerateApp(self, request, context):
         try:
@@ -33,12 +33,12 @@ class AppStormServiceServicer(appstorm_pb2_grpc.AppStormServiceServicer):
             appId, appSessionId = create_app(userId, loginToken, loginSession, request.prompt)
             finalAppId = poll_app_status(appSessionId, appId, loginToken, loginSession)
             url = get_share_link(finalAppId, loginToken, loginSession)
-            return appstorm_pb2.GenerateAppResponse(success=True, url=url)
+            return appstormapp_pb2.GenerateAppResponse(success=True, url=url)
         except Exception as e:
-            return appstorm_pb2.GenerateAppResponse(success=False, error=str(e))
+            return appstormapp_pb2.GenerateAppResponse(success=False, error=str(e))
     
     def PublishNFT(self, request, context):
-        return appstorm_pb2.PublishNFTResponse(
+        return appstormapp_pb2.PublishNFTResponse(
             success=True,
             message="NFT publishing endpoint placeholder",
             data=""
@@ -46,7 +46,7 @@ class AppStormServiceServicer(appstorm_pb2_grpc.AppStormServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    appstorm_pb2_grpc.add_AppStormServiceServicer_to_server(AppStormServiceServicer(), server)
+    appstormapp_pb2_grpc.add_AppStormServiceServicer_to_server(AppStormServiceServicer(), server)
     server.add_insecure_port('[::]:50055')
     print("gRPC server running on port 50055")
     server.start()
