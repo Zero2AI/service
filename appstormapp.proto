@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package appstorm;
+
+// Define the gRPC service
+service appstormapp {
+  // RPC to generate an app
+  rpc GenerateApp (GenerateAppRequest) returns (GenerateAppResponse);
+}
+
+// Request message for GenerateApp
+message GenerateAppRequest {
+  string email = 1;
+  string password = 2;
+  string prompt = 3;
+}
+
+// Response message for GenerateApp
+message GenerateAppResponse {
+  bool success = 1;
+  string url = 2;      // final share URL
+  string error = 3;    // optional error message
+}
